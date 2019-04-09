@@ -184,18 +184,27 @@ void construct_block_blob(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     if (!Buffer::HasInstance(block_template_buf) || !Buffer::HasInstance(nonce_buf))
         return THROW_ERROR_EXCEPTION("Both arguments should be buffer objects.");
 
-    if (Buffer::Length(nonce_buf) != 4)
-        return THROW_ERROR_EXCEPTION("Nonce buffer has invalid size.");
-
-    uint32_t nonce = *reinterpret_cast<uint32_t*>(Buffer::Data(nonce_buf));
-
     blobdata block_template_blob = std::string(Buffer::Data(block_template_buf), Buffer::Length(block_template_buf));
     blobdata output = "";
 
     block b = AUTO_VAL_INIT(b);
     if (!parse_and_validate_block_from_blob(block_template_blob, b))
         return THROW_ERROR_EXCEPTION("Failed to parse block");
-    b.nonce = nonce;
+
+
+    if (b.major_version >= 8)
+    {
+        if (Buffer::Length(nonce_buf) != 8)
+            return THROW_ERROR_EXCEPTION((std::string("Nonce buffer has invalid size: ") + std::to_string(Buffer::Length(nonce_buf))).c_str());
+        b.nonce = *reinterpret_cast<uint64_t*>(Buffer::Data(nonce_buf));
+    }
+    else
+    {
+        if (Buffer::Length(nonce_buf) != 4)
+            return THROW_ERROR_EXCEPTION((std::string("Nonce buffer has invalid size: ") + std::to_string(Buffer::Length(nonce_buf))).c_str());
+        b.nonce = *reinterpret_cast<uint32_t*>(Buffer::Data(nonce_buf));
+    }
+
     if (!block_to_blob(b, output))
         return THROW_ERROR_EXCEPTION("Failed to convert block to blob");
 
