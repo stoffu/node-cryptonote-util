@@ -194,14 +194,14 @@ void construct_block_blob(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     if (b.major_version >= 8)
     {
-        if (Buffer::Length(nonce_buf) != 8)
-            return THROW_ERROR_EXCEPTION((std::string("Nonce buffer has invalid size: ") + std::to_string(Buffer::Length(nonce_buf))).c_str());
+        // if (Buffer::Length(nonce_buf) != 8)
+        //     return THROW_ERROR_EXCEPTION((std::string("Nonce buffer has invalid size: ") + std::to_string(Buffer::Length(nonce_buf))).c_str());
         b.nonce = *reinterpret_cast<uint64_t*>(Buffer::Data(nonce_buf));
     }
     else
     {
-        if (Buffer::Length(nonce_buf) != 4)
-            return THROW_ERROR_EXCEPTION((std::string("Nonce buffer has invalid size: ") + std::to_string(Buffer::Length(nonce_buf))).c_str());
+        // if (Buffer::Length(nonce_buf) != 4)
+        //     return THROW_ERROR_EXCEPTION((std::string("Nonce buffer has invalid size: ") + std::to_string(Buffer::Length(nonce_buf))).c_str());
         b.nonce = *reinterpret_cast<uint32_t*>(Buffer::Data(nonce_buf));
     }
 
